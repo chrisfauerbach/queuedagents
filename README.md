@@ -76,6 +76,7 @@ All endpoints are prefixed with `/api`.
 | `GET` | `/api/jobs` | List jobs (query: `status`, `limit`, `offset`) |
 | `GET` | `/api/jobs/:id` | Get a single job |
 | `GET` | `/api/stats` | Aggregate job status counts |
+| `GET` | `/api/token-usage?hours=24` | Cumulative token usage per model (1-168 hour window) |
 
 ### GPU Metrics
 
@@ -113,6 +114,17 @@ All endpoints are prefixed with `/api`.
 ## Model Comparison
 
 The Compare feature (`/compare`) lets you run the same prompt against multiple models side-by-side. A comparison creates one job per selected model, all sharing the same prompt and parameters. Results are displayed in a side-by-side grid with per-model status, output, token counts, and generation speed. The detail page auto-refreshes until all jobs complete.
+
+## Token Usage Tracking
+
+The dashboard includes a cumulative token usage chart that tracks input and output tokens consumed per model over time. The chart:
+
+- Shows one line per model, each in a distinct color
+- Displays cumulative total tokens on the Y-axis with auto-scaled labels (K/M suffixes)
+- Updates every 10 seconds via polling
+- Queries the last 24 hours of completed jobs by default
+
+The data is derived from `input_tokens` and `output_tokens` already recorded on each completed job — no additional database tables are required.
 
 ## GPU Monitoring
 
@@ -155,7 +167,7 @@ queuedagents/
 ├── frontend/            # React SPA
 │   ├── src/
 │   │   ├── api/client.ts
-│   │   ├── components/  # GpuChart, JobList, JobDetail, StatsCards, etc.
+│   │   ├── components/  # GpuChart, TokenChart, JobList, JobDetail, StatsCards, etc.
 │   │   ├── hooks/       # usePolling
 │   │   ├── pages/       # DashboardPage, JobDetailPage, ComparePage, ComparisonDetailPage
 │   │   └── types/

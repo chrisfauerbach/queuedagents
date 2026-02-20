@@ -1,15 +1,17 @@
 import { useCallback } from "react";
-import { fetchJobs, fetchStats, fetchGpuMetrics } from "../api/client";
+import { fetchJobs, fetchStats, fetchGpuMetrics, fetchTokenUsage } from "../api/client";
 import { usePolling } from "../hooks/usePolling";
 import StatsCards from "../components/StatsCards";
 import JobList from "../components/JobList";
 import JobSubmitForm from "../components/JobSubmitForm";
 import GpuChart from "../components/GpuChart";
+import TokenChart from "../components/TokenChart";
 
 export default function DashboardPage() {
   const statsFetcher = useCallback(() => fetchStats(), []);
   const jobsFetcher = useCallback(() => fetchJobs(), []);
   const gpuFetcher = useCallback(() => fetchGpuMetrics(10), []);
+  const tokenFetcher = useCallback(() => fetchTokenUsage(24), []);
 
   const { data: stats, loading: statsLoading } = usePolling(statsFetcher, 3000);
   const {
@@ -18,6 +20,7 @@ export default function DashboardPage() {
     refresh: refreshJobs,
   } = usePolling(jobsFetcher, 3000);
   const { data: gpuMetrics } = usePolling(gpuFetcher, 5000);
+  const { data: tokenUsage } = usePolling(tokenFetcher, 10000);
 
   function handleSubmitted() {
     refreshJobs();
@@ -31,6 +34,8 @@ export default function DashboardPage() {
       )}
 
       {gpuMetrics && <GpuChart metrics={gpuMetrics} />}
+
+      {tokenUsage && <TokenChart data={tokenUsage} />}
 
       <JobSubmitForm onSubmitted={handleSubmitted} />
 

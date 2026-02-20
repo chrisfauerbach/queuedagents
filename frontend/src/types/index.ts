@@ -62,6 +62,15 @@ export interface ComparisonCreatePayload {
   max_tokens?: number;
 }
 
+export interface TokenUsagePoint {
+  model: string;
+  timestamp: string;
+  cumulative_input_tokens: number;
+  cumulative_output_tokens: number;
+  cumulative_total_tokens: number;
+  job_count: number;
+}
+
 export interface GpuMetric {
   id: number;
   gpu_index: number;

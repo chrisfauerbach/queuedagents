@@ -71,6 +71,15 @@ class ComparisonResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class TokenUsagePoint(BaseModel):
+    model: str
+    timestamp: datetime
+    cumulative_input_tokens: int
+    cumulative_output_tokens: int
+    cumulative_total_tokens: int
+    job_count: int
+
+
 class GpuMetricResponse(BaseModel):
     id: int
     gpu_index: int
