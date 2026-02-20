@@ -83,6 +83,20 @@ All endpoints are prefixed with `/api`.
 |---|---|---|
 | `GET` | `/api/gpu/metrics?minutes=10` | GPU time-series data (1-60 min window) |
 
+### Comparisons
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/comparisons` | Create a comparison (runs same prompt across N models) |
+| `GET` | `/api/comparisons` | List all comparisons with their jobs |
+| `GET` | `/api/comparisons/:id` | Get a single comparison with jobs |
+
+### Models
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api/models` | List available Ollama models |
+
 ### Health
 
 | Method | Path | Description |
@@ -95,6 +109,10 @@ All endpoints are prefixed with `/api`.
 2. The **worker** picks up the oldest pending job, marks it as `processing`, and sends it to Ollama.
 3. On completion, the worker records the result along with **input tokens**, **output tokens**, and **generation time** from the Ollama response.
 4. The **dashboard** polls for updates and displays status, results, and token throughput.
+
+## Model Comparison
+
+The Compare feature (`/compare`) lets you run the same prompt against multiple models side-by-side. A comparison creates one job per selected model, all sharing the same prompt and parameters. Results are displayed in a side-by-side grid with per-model status, output, token counts, and generation speed. The detail page auto-refreshes until all jobs complete.
 
 ## GPU Monitoring
 
@@ -116,7 +134,9 @@ queuedagents/
 │   │   ├── main.py      # App entrypoint, CORS, router mounting
 │   │   ├── routes/
 │   │   │   ├── jobs.py  # Job CRUD + stats endpoints
-│   │   │   └── gpu.py   # GPU metrics endpoint
+│   │   │   ├── gpu.py   # GPU metrics endpoint
+│   │   │   ├── comparisons.py  # Model comparison endpoints
+│   │   │   └── models.py       # Ollama model listing
 │   │   └── schemas.py   # Pydantic request/response models
 │   ├── alembic/         # Database migrations
 │   ├── Dockerfile
@@ -137,14 +157,14 @@ queuedagents/
 │   │   ├── api/client.ts
 │   │   ├── components/  # GpuChart, JobList, JobDetail, StatsCards, etc.
 │   │   ├── hooks/       # usePolling
-│   │   ├── pages/       # DashboardPage, JobDetailPage
+│   │   ├── pages/       # DashboardPage, JobDetailPage, ComparePage, ComparisonDetailPage
 │   │   └── types/
 │   ├── Dockerfile
 │   └── nginx.conf
 ├── shared/              # Shared Python package
 │   ├── config.py        # Pydantic settings
 │   ├── database.py      # SQLAlchemy async engine + session
-│   └── models.py        # Job, GpuMetric ORM models
+│   └── models.py        # Job, Comparison, GpuMetric ORM models
 ├── docker-compose.yml
 └── .env.example
 ```

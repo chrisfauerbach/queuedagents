@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Enum as SAEnum, Float, Index, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, Enum as SAEnum, Float, ForeignKey, Index, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared.database import Base
 
@@ -47,6 +47,30 @@ class Job(Base):
     input_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     output_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     generation_time_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    comparison_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("comparisons.id"), nullable=True
+    )
+
+
+class Comparison(Base):
+    __tablename__ = "comparisons"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    prompt: Mapped[str] = mapped_column(Text, nullable=False)
+    system_prompt: Mapped[str | None] = mapped_column(Text, nullable=True)
+    temperature: Mapped[float] = mapped_column(Float, default=0.7)
+    max_tokens: Mapped[int] = mapped_column(Integer, default=2048)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    jobs: Mapped[list["Job"]] = relationship(
+        "Job", backref="comparison", lazy="selectin"
+    )
 
 
 class GpuMetric(Base):

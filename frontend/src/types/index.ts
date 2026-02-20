@@ -34,6 +34,34 @@ export interface JobCreatePayload {
   max_tokens?: number;
 }
 
+export interface OllamaModel {
+  name: string;
+  size: number;
+  family: string | null;
+  parameter_size: string | null;
+  quantization_level: string | null;
+}
+
+export interface Comparison {
+  id: string;
+  name: string;
+  prompt: string;
+  system_prompt: string | null;
+  temperature: number;
+  max_tokens: number;
+  created_at: string;
+  jobs: Job[];
+}
+
+export interface ComparisonCreatePayload {
+  name: string;
+  prompt: string;
+  models: string[];
+  system_prompt?: string;
+  temperature?: number;
+  max_tokens?: number;
+}
+
 export interface GpuMetric {
   id: number;
   gpu_index: number;

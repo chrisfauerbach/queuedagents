@@ -1,4 +1,4 @@
-import type { Job, Stats, JobCreatePayload, GpuMetric } from "../types";
+import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload } from "../types";
 
 const BASE = "/api";
 
@@ -31,6 +31,26 @@ export function createJob(payload: JobCreatePayload): Promise<Job> {
   });
 }
 
+export function fetchModels(): Promise<OllamaModel[]> {
+  return request<OllamaModel[]>("/models");
+}
+
 export function fetchGpuMetrics(minutes: number = 10): Promise<GpuMetric[]> {
   return request<GpuMetric[]>(`/gpu/metrics?minutes=${minutes}`);
+}
+
+export function createComparison(payload: ComparisonCreatePayload): Promise<Comparison> {
+  return request<Comparison>("/comparisons", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function fetchComparisons(): Promise<Comparison[]> {
+  return request<Comparison[]>("/comparisons");
+}
+
+export function fetchComparison(id: string): Promise<Comparison> {
+  return request<Comparison>(`/comparisons/${id}`);
 }

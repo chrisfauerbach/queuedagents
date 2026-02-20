@@ -31,7 +31,7 @@ All Python services import from `shared/` (models, database, config). `PYTHONPAT
 - **ORM models**: Defined in `shared/models.py` using SQLAlchemy 2.0 `Mapped` style. Tables are auto-created on startup via `Base.metadata.create_all`.
 - **API schemas**: Pydantic models in `backend/app/schemas.py` with `model_config = {"from_attributes": True}` for ORM compatibility.
 - **Frontend polling**: `usePolling(fetcher, intervalMs)` hook handles all data fetching with auto-refresh. API client functions are in `frontend/src/api/client.ts`.
-- **Frontend routing**: React Router with two pages — `DashboardPage` (/) and `JobDetailPage` (/jobs/:id).
+- **Frontend routing**: React Router with four pages — `DashboardPage` (/), `JobDetailPage` (/jobs/:id), `ComparePage` (/compare), and `ComparisonDetailPage` (/compare/:id).
 - **No chart libraries**: GPU chart uses raw inline SVG in `GpuChart.tsx`.
 - **Config**: `shared/config.py` uses Pydantic Settings, reads from `.env` file. Key vars: `DATABASE_URL`, `OLLAMA_HOST`, `POLL_INTERVAL`, `GPU_POLL_INTERVAL`.
 
@@ -49,8 +49,9 @@ docker compose ps                 # Check service status
 
 ## Database
 
-SQLite at `./data/queue.db`. Two tables:
-- `jobs` — Job queue with status tracking, token counts, generation time
+SQLite at `./data/queue.db`. Three tables:
+- `jobs` — Job queue with status tracking, token counts, generation time. Has optional `comparison_id` FK to `comparisons`.
+- `comparisons` — Model comparison groups. Each comparison spawns one job per model with shared prompt/params.
 - `gpu_metrics` — Time-series GPU metrics, auto-pruned to 1 hour
 
 Schema changes require deleting the DB file (`rm data/queue.db`) and restarting, since `create_all` only adds missing tables. Alembic is configured but migrations are not currently used for new columns.
@@ -58,6 +59,8 @@ Schema changes require deleting the DB file (`rm data/queue.db`) and restarting,
 ## Testing Notes
 
 - Submit a test job: `curl -X POST http://localhost:8001/api/jobs -H 'Content-Type: application/json' -d '{"model":"gemma3:12b","prompt":"Hello"}'`
+- Create a comparison: `curl -X POST http://localhost:8001/api/comparisons -H 'Content-Type: application/json' -d '{"name":"Test","prompt":"Hello","models":["mistral:7b","qwen2.5:7b"]}'`
+- List comparisons: `curl http://localhost:8001/api/comparisons`
 - Check GPU metrics: `curl http://localhost:8001/api/gpu/metrics?minutes=1`
 - Health check: `curl http://localhost:8001/api/health`
 

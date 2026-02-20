@@ -41,6 +41,36 @@ class StatsResponse(BaseModel):
     total: int
 
 
+class OllamaModelResponse(BaseModel):
+    name: str
+    size: int
+    family: str | None = None
+    parameter_size: str | None = None
+    quantization_level: str | None = None
+
+
+class ComparisonCreate(BaseModel):
+    name: str = Field(..., max_length=200)
+    prompt: str = Field(..., min_length=1)
+    models: list[str] = Field(..., min_length=1)
+    system_prompt: str | None = None
+    temperature: float = Field(0.7, ge=0.0, le=2.0)
+    max_tokens: int = Field(2048, ge=1, le=128000)
+
+
+class ComparisonResponse(BaseModel):
+    id: str
+    name: str
+    prompt: str
+    system_prompt: str | None
+    temperature: float
+    max_tokens: int
+    created_at: datetime
+    jobs: list[JobResponse]
+
+    model_config = {"from_attributes": True}
+
+
 class GpuMetricResponse(BaseModel):
     id: int
     gpu_index: int

@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { createJob } from "../api/client";
+import { useState, useEffect } from "react";
+import { createJob, fetchModels } from "../api/client";
+import type { OllamaModel } from "../types";
+
+function formatSize(bytes: number): string {
+  const gb = bytes / (1024 * 1024 * 1024);
+  if (gb >= 1) return `${gb.toFixed(1)} GB`;
+  const mb = bytes / (1024 * 1024);
+  return `${mb.toFixed(0)} MB`;
+}
 
 export default function JobSubmitForm({
   onSubmitted,
@@ -7,6 +15,7 @@ export default function JobSubmitForm({
   onSubmitted: () => void;
 }) {
   const [model, setModel] = useState("gemma3:12b");
+  const [models, setModels] = useState<OllamaModel[]>([]);
   const [prompt, setPrompt] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState("0.7");
@@ -14,6 +23,17 @@ export default function JobSubmitForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  useEffect(() => {
+    fetchModels()
+      .then((list) => {
+        setModels(list);
+        if (list.length > 0 && !list.some((m) => m.name === model)) {
+          setModel(list[0].name);
+        }
+      })
+      .catch(() => setModels([]));
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,12 +63,27 @@ export default function JobSubmitForm({
           <label className="block text-xs font-medium text-gray-500 mb-1">
             Model
           </label>
-          <input
-            type="text"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1.5 text-sm w-40"
-          />
+          {models.length > 0 ? (
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1.5 text-sm w-48 bg-white"
+            >
+              {models.map((m) => (
+                <option key={m.name} value={m.name}>
+                  {m.name} ({formatSize(m.size)})
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="text"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1.5 text-sm w-40"
+              placeholder="e.g. gemma3:12b"
+            />
+          )}
         </div>
         <div className="flex-1">
           <label className="block text-xs font-medium text-gray-500 mb-1">
