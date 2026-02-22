@@ -97,6 +97,26 @@ All endpoints are prefixed with `/api`.
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/api/models` | List available Ollama models |
+| `GET` | `/api/models/catalog` | Curated model catalog with installed status |
+| `POST` | `/api/models/pull` | Pull/download a model (streams NDJSON progress) |
+| `POST` | `/api/models/show` | Get detailed model info (license, family, quantization) |
+| `DELETE` | `/api/models` | Delete a local model |
+
+### Prompts
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/prompts` | Save a reusable prompt |
+| `GET` | `/api/prompts` | List all saved prompts |
+| `GET` | `/api/prompts/:id` | Get a single prompt |
+| `PUT` | `/api/prompts/:id` | Update a prompt |
+| `DELETE` | `/api/prompts/:id` | Delete a prompt |
+
+### Leaderboard
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api/leaderboard` | Model performance leaderboard with win rates |
 
 ### Health
 
@@ -111,15 +131,32 @@ All endpoints are prefixed with `/api`.
 3. On completion, the worker records the result along with **input tokens**, **output tokens**, and **generation time** from the Ollama response.
 4. The **dashboard** polls for updates and displays status, results, and token throughput.
 
+## Model Management
+
+The Models page (`/models`) provides a full model management interface:
+
+- **Installed models table** — Shows name, size, family, parameters, and quantization for all local models. Two-click delete confirmation.
+- **Curated catalog** — Browse ~15 model families across 6 categories (General Purpose, Code, Reasoning, Chat/Instruct, Small/Fast, Multilingual). Click a variant chip to pull it.
+- **Real-time download progress** — Pull streams NDJSON from Ollama with animated progress bars.
+- **Custom pull** — Text input for pulling any model by name (e.g. `llama3.1:8b`).
+
 ## Model Comparison
 
 The Compare feature (`/compare`) lets you run the same prompt against multiple models side-by-side. A comparison creates one job per selected model, all sharing the same prompt and parameters. Results are displayed in a side-by-side grid with per-model status, output, token counts, and generation speed. The detail page auto-refreshes until all jobs complete.
+
+## Prompt Library
+
+The Prompts page (`/prompts`) lets you save reusable prompts with parameters (system prompt, temperature, max tokens). Saved prompts can be edited, deleted, run directly as a comparison against selected models, or sent to the Compare page pre-filled.
+
+## Model Leaderboard
+
+The Leaderboard page (`/leaderboard`) ranks models by performance metrics including average tokens per second, generation time, total token usage, and comparison win rate.
 
 ## Token Usage Tracking
 
 The dashboard includes a cumulative token usage chart that tracks input and output tokens consumed per model over time. The chart:
 
-- Shows one line per model, each in a distinct color
+- Shows one line per model, each in a distinct color (16-color palette)
 - Displays cumulative total tokens on the Y-axis with auto-scaled labels (K/M suffixes)
 - Updates every 10 seconds via polling
 - Queries the last 24 hours of completed jobs by default
@@ -148,7 +185,10 @@ queuedagents/
 │   │   │   ├── jobs.py  # Job CRUD + stats endpoints
 │   │   │   ├── gpu.py   # GPU metrics endpoint
 │   │   │   ├── comparisons.py  # Model comparison endpoints
-│   │   │   └── models.py       # Ollama model listing
+│   │   │   ├── models.py       # Model listing, catalog, pull, show, delete
+│   │   │   ├── prompts.py      # Prompt CRUD endpoints
+│   │   │   └── leaderboard.py  # Model leaderboard endpoint
+│   │   ├── model_catalog.py    # Curated model catalog data
 │   │   └── schemas.py   # Pydantic request/response models
 │   ├── alembic/         # Database migrations
 │   ├── Dockerfile
@@ -167,16 +207,16 @@ queuedagents/
 ├── frontend/            # React SPA
 │   ├── src/
 │   │   ├── api/client.ts
-│   │   ├── components/  # GpuChart, TokenChart, JobList, JobDetail, StatsCards, etc.
+│   │   ├── components/  # GpuChart, TokenChart, JobList, JobDetail, StatsCards, Layout, etc.
 │   │   ├── hooks/       # usePolling
-│   │   ├── pages/       # DashboardPage, JobDetailPage, ComparePage, ComparisonDetailPage
+│   │   ├── pages/       # Dashboard, JobDetail, Prompts, Compare, ComparisonDetail, Leaderboard, Models
 │   │   └── types/
 │   ├── Dockerfile
 │   └── nginx.conf
 ├── shared/              # Shared Python package
 │   ├── config.py        # Pydantic settings
 │   ├── database.py      # SQLAlchemy async engine + session
-│   └── models.py        # Job, Comparison, GpuMetric ORM models
+│   └── models.py        # Job, Comparison, GpuMetric, Prompt ORM models
 ├── docker-compose.yml
 └── .env.example
 ```
