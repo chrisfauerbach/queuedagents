@@ -42,6 +42,14 @@ export default function Layout() {
             >
               Leaderboard
             </NavLink>
+            <NavLink
+              to="/models"
+              className={({ isActive }) =>
+                isActive ? "text-blue-600 font-medium" : "text-gray-500 hover:text-gray-700"
+              }
+            >
+              Models
+            </NavLink>
           </nav>
         </div>
       </header>

@@ -1,4 +1,4 @@
-import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload, TokenUsagePoint, ModelLeaderboardEntry, Prompt, PromptCreatePayload, PromptUpdatePayload } from "../types";
+import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload, TokenUsagePoint, ModelLeaderboardEntry, Prompt, PromptCreatePayload, PromptUpdatePayload, CatalogModel, ModelShowInfo, PullProgress } from "../types";
 
 const BASE = "/api";
 
@@ -90,4 +90,67 @@ export function updatePrompt(id: string, payload: PromptUpdatePayload): Promise<
 
 export function deletePrompt(id: string): Promise<void> {
   return request<void>(`/prompts/${id}`, { method: "DELETE" });
+}
+
+export function fetchCatalog(): Promise<CatalogModel[]> {
+  return request<CatalogModel[]>("/models/catalog");
+}
+
+export function showModel(name: string): Promise<ModelShowInfo> {
+  return request<ModelShowInfo>("/models/show", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function deleteModel(name: string): Promise<void> {
+  return request<void>("/models", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function pullModel(
+  name: string,
+  onProgress: (progress: PullProgress) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`${BASE}/models/pull`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+    signal,
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`${res.status}: ${body}`);
+  }
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+    for (const line of lines) {
+      if (line.trim()) {
+        try {
+          onProgress(JSON.parse(line));
+        } catch {
+          // skip malformed lines
+        }
+      }
+    }
+  }
+  if (buffer.trim()) {
+    try {
+      onProgress(JSON.parse(buffer));
+    } catch {
+      // skip
+    }
+  }
 }

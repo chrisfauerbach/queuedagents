@@ -123,3 +123,35 @@ export interface GpuMetric {
   power_watts: number;
   recorded_at: string;
 }
+
+export interface CatalogVariant {
+  tag: string;
+  parameter_size: string;
+  full_name: string;
+  installed: boolean;
+}
+
+export interface CatalogModel {
+  name: string;
+  description: string;
+  category: string;
+  variants: CatalogVariant[];
+}
+
+export interface ModelShowInfo {
+  license: string | null;
+  modelfile: string | null;
+  template: string | null;
+  system: string | null;
+  parameters: string | null;
+  family: string | null;
+  parameter_size: string | null;
+  quantization_level: string | null;
+}
+
+export interface PullProgress {
+  status: string;
+  digest?: string;
+  total?: number;
+  completed?: number;
+}

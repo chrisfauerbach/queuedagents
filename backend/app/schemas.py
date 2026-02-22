@@ -135,3 +135,36 @@ class GpuMetricResponse(BaseModel):
     recorded_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ModelPullRequest(BaseModel):
+    name: str
+
+
+class ModelDeleteRequest(BaseModel):
+    name: str
+
+
+class ModelShowResponse(BaseModel):
+    license: str | None = None
+    modelfile: str | None = None
+    template: str | None = None
+    system: str | None = None
+    parameters: str | None = None
+    family: str | None = None
+    parameter_size: str | None = None
+    quantization_level: str | None = None
+
+
+class CatalogVariantResponse(BaseModel):
+    tag: str
+    parameter_size: str
+    full_name: str
+    installed: bool
+
+
+class CatalogModelResponse(BaseModel):
+    name: str
+    description: str
+    category: str
+    variants: list[CatalogVariantResponse]

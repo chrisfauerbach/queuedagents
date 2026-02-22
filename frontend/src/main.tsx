@@ -8,6 +8,7 @@ import JobDetailPage from "./pages/JobDetailPage";
 import ComparePage from "./pages/ComparePage";
 import ComparisonDetailPage from "./pages/ComparisonDetailPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
+import ModelsPage from "./pages/ModelsPage";
 import PromptsPage from "./pages/PromptsPage";
 
 createRoot(document.getElementById("root")!).render(
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/compare/:id" element={<ComparisonDetailPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/models" element={<ModelsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
