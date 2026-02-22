@@ -71,6 +71,20 @@ export interface TokenUsagePoint {
   job_count: number;
 }
 
+export interface ModelLeaderboardEntry {
+  model: string;
+  total_jobs: number;
+  completed_jobs: number;
+  failed_jobs: number;
+  avg_tokens_per_second: number | null;
+  avg_generation_time_ms: number | null;
+  total_input_tokens: number;
+  total_output_tokens: number;
+  comparison_wins: number;
+  comparison_appearances: number;
+  win_rate: number | null;
+}
+
 export interface GpuMetric {
   id: number;
   gpu_index: number;

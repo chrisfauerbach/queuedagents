@@ -80,6 +80,20 @@ class TokenUsagePoint(BaseModel):
     job_count: int
 
 
+class ModelLeaderboardEntry(BaseModel):
+    model: str
+    total_jobs: int
+    completed_jobs: int
+    failed_jobs: int
+    avg_tokens_per_second: float | None
+    avg_generation_time_ms: float | None
+    total_input_tokens: int
+    total_output_tokens: int
+    comparison_wins: int
+    comparison_appearances: int
+    win_rate: float | None
+
+
 class GpuMetricResponse(BaseModel):
     id: int
     gpu_index: int

@@ -26,6 +26,14 @@ export default function Layout() {
             >
               Compare
             </NavLink>
+            <NavLink
+              to="/leaderboard"
+              className={({ isActive }) =>
+                isActive ? "text-blue-600 font-medium" : "text-gray-500 hover:text-gray-700"
+              }
+            >
+              Leaderboard
+            </NavLink>
           </nav>
         </div>
       </header>

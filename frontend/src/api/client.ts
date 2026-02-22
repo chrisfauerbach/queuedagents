@@ -1,4 +1,4 @@
-import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload, TokenUsagePoint } from "../types";
+import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload, TokenUsagePoint, ModelLeaderboardEntry } from "../types";
 
 const BASE = "/api";
 
@@ -57,4 +57,8 @@ export function fetchComparison(id: string): Promise<Comparison> {
 
 export function fetchTokenUsage(hours: number = 24): Promise<TokenUsagePoint[]> {
   return request<TokenUsagePoint[]>(`/token-usage?hours=${hours}`);
+}
+
+export function fetchLeaderboard(): Promise<ModelLeaderboardEntry[]> {
+  return request<ModelLeaderboardEntry[]>("/leaderboard");
 }
