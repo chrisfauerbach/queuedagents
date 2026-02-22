@@ -10,7 +10,24 @@ const PAD = { top: 10, right: 20, bottom: 30, left: 55 };
 const INNER_W = CHART_W - PAD.left - PAD.right;
 const INNER_H = CHART_H - PAD.top - PAD.bottom;
 
-const COLORS = ["#22d3ee", "#a78bfa", "#f97316", "#34d399", "#f472b6"];
+const COLORS = [
+  "#22d3ee", // cyan
+  "#a78bfa", // violet
+  "#f97316", // orange
+  "#34d399", // emerald
+  "#f472b6", // pink
+  "#facc15", // yellow
+  "#60a5fa", // blue
+  "#fb7185", // rose
+  "#4ade80", // green
+  "#e879f9", // fuchsia
+  "#38bdf8", // sky
+  "#f87171", // red
+  "#a3e635", // lime
+  "#2dd4bf", // teal
+  "#c084fc", // purple
+  "#fbbf24", // amber
+];
 
 function buildPath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return "";
