@@ -20,7 +20,7 @@ const LINES: {
 }[] = [
   {
     key: "util",
-    color: "#22d3ee",
+    color: "#60a5fa",
     label: "GPU %",
     getValue: (m) => m.gpu_utilization,
     max: 100,
@@ -28,7 +28,7 @@ const LINES: {
   },
   {
     key: "mem",
-    color: "#a78bfa",
+    color: "#e879f9",
     label: "Mem %",
     getValue: (m) =>
       m.memory_total_mb > 0
@@ -39,7 +39,7 @@ const LINES: {
   },
   {
     key: "temp",
-    color: "#f97316",
+    color: "#f87171",
     label: "Temp",
     getValue: (m) => m.temperature_c,
     max: 100,
