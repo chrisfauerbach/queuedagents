@@ -71,6 +71,35 @@ class ComparisonResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PromptCreate(BaseModel):
+    name: str = Field(..., max_length=200)
+    prompt: str = Field(..., min_length=1)
+    system_prompt: str | None = None
+    temperature: float = Field(0.7, ge=0.0, le=2.0)
+    max_tokens: int = Field(2048, ge=1, le=128000)
+
+
+class PromptUpdate(BaseModel):
+    name: str | None = Field(None, max_length=200)
+    prompt: str | None = Field(None, min_length=1)
+    system_prompt: str | None = None
+    temperature: float | None = Field(None, ge=0.0, le=2.0)
+    max_tokens: int | None = Field(None, ge=1, le=128000)
+
+
+class PromptResponse(BaseModel):
+    id: str
+    name: str
+    prompt: str
+    system_prompt: str | None
+    temperature: float
+    max_tokens: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
 class TokenUsagePoint(BaseModel):
     model: str
     timestamp: datetime

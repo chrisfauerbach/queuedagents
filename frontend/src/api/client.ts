@@ -1,4 +1,4 @@
-import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload, TokenUsagePoint, ModelLeaderboardEntry } from "../types";
+import type { Job, Stats, JobCreatePayload, GpuMetric, OllamaModel, Comparison, ComparisonCreatePayload, TokenUsagePoint, ModelLeaderboardEntry, Prompt, PromptCreatePayload, PromptUpdatePayload } from "../types";
 
 const BASE = "/api";
 
@@ -8,6 +8,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const body = await res.text();
     throw new Error(`${res.status}: ${body}`);
   }
+  if (res.status === 204) return undefined as T;
   return res.json();
 }
 
@@ -61,4 +62,32 @@ export function fetchTokenUsage(hours: number = 24): Promise<TokenUsagePoint[]> 
 
 export function fetchLeaderboard(): Promise<ModelLeaderboardEntry[]> {
   return request<ModelLeaderboardEntry[]>("/leaderboard");
+}
+
+export function fetchPrompts(): Promise<Prompt[]> {
+  return request<Prompt[]>("/prompts");
+}
+
+export function fetchPrompt(id: string): Promise<Prompt> {
+  return request<Prompt>(`/prompts/${id}`);
+}
+
+export function createPrompt(payload: PromptCreatePayload): Promise<Prompt> {
+  return request<Prompt>("/prompts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updatePrompt(id: string, payload: PromptUpdatePayload): Promise<Prompt> {
+  return request<Prompt>(`/prompts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deletePrompt(id: string): Promise<void> {
+  return request<void>(`/prompts/${id}`, { method: "DELETE" });
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { createComparison, fetchComparisons, fetchModels } from "../api/client";
 import { usePolling } from "../hooks/usePolling";
 import type { OllamaModel } from "../types";
@@ -26,6 +26,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function ComparePage() {
+  const location = useLocation();
   const [models, setModels] = useState<OllamaModel[]>([]);
   const [name, setName] = useState("");
   const [prompt, setPrompt] = useState("");
@@ -49,6 +50,33 @@ export default function ComparePage() {
       .then((list) => setModels(list))
       .catch(() => setModels([]));
   }, []);
+
+  useEffect(() => {
+    const state = location.state as {
+      promptName?: string;
+      prompt?: string;
+      system_prompt?: string;
+      temperature?: number;
+      max_tokens?: number;
+    } | null;
+    if (state?.prompt) {
+      if (state.promptName) setName(state.promptName);
+      setPrompt(state.prompt);
+      if (state.system_prompt) {
+        setSystemPrompt(state.system_prompt);
+        setShowAdvanced(true);
+      }
+      if (state.temperature !== undefined && state.temperature !== 0.7) {
+        setTemperature(String(state.temperature));
+        setShowAdvanced(true);
+      }
+      if (state.max_tokens !== undefined && state.max_tokens !== 2048) {
+        setMaxTokens(String(state.max_tokens));
+        setShowAdvanced(true);
+      }
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   function toggleModel(modelName: string) {
     setSelectedModels((prev) =>

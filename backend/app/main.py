@@ -9,6 +9,7 @@ from backend.app.routes.gpu import router as gpu_router
 from backend.app.routes.models import router as models_router
 from backend.app.routes.comparisons import router as comparisons_router
 from backend.app.routes.leaderboard import router as leaderboard_router
+from backend.app.routes.prompts import router as prompts_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ app.include_router(gpu_router, prefix="/api")
 app.include_router(models_router, prefix="/api")
 app.include_router(comparisons_router, prefix="/api")
 app.include_router(leaderboard_router, prefix="/api")
+app.include_router(prompts_router, prefix="/api")
 
 
 @app.get("/api/health")

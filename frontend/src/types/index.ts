@@ -85,6 +85,33 @@ export interface ModelLeaderboardEntry {
   win_rate: number | null;
 }
 
+export interface Prompt {
+  id: string;
+  name: string;
+  prompt: string;
+  system_prompt: string | null;
+  temperature: number;
+  max_tokens: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptCreatePayload {
+  name: string;
+  prompt: string;
+  system_prompt?: string;
+  temperature?: number;
+  max_tokens?: number;
+}
+
+export interface PromptUpdatePayload {
+  name?: string;
+  prompt?: string;
+  system_prompt?: string | null;
+  temperature?: number;
+  max_tokens?: number;
+}
+
 export interface GpuMetric {
   id: number;
   gpu_index: number;
