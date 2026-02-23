@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from shared.database import Base, engine
+from backend.app.seed import seed_prompts
 from backend.app.routes.jobs import router as jobs_router
 from backend.app.routes.gpu import router as gpu_router
 from backend.app.routes.models import router as models_router
@@ -16,6 +17,7 @@ from backend.app.routes.prompts import router as prompts_router
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await seed_prompts()
     yield
 
 

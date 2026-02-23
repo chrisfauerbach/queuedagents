@@ -1,0 +1,315 @@
+[
+  {
+    "name": "Logic Puzzle: Knights and Knaves",
+    "prompt": "On an island, every inhabitant is either a knight (always tells the truth) or a knave (always lies). You meet three inhabitants: A, B, and C.\n\nA says: \"All of us are knaves.\"\nB says: \"Exactly one of us is a knight.\"\n\nWhat are A, B, and C? Prove your answer by checking it against all stated claims.",
+    "system_prompt": "You are a formal logic tutor. Show each deduction step clearly and verify the solution exhaustively.",
+    "temperature": 0.3,
+    "max_tokens": 4096
+  },
+  {
+    "name": "Ethical Dilemma: Autonomous Vehicle",
+    "prompt": "An autonomous vehicle's brakes fail. It can stay on course and hit 3 elderly pedestrians, or swerve and hit 1 child. There is no other option.\n\nAnalyze this from utilitarian, deontological, virtue ethics, and care ethics perspectives. Then propose what the vehicle manufacturer's default policy should be and defend it.",
+    "temperature": 0.7,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Causal Analysis: Correlation Trap",
+    "prompt": "A study finds that cities with more ice cream trucks per capita have higher crime rates. A journalist writes: \"Ice cream trucks may be fueling crime wave.\"\n\nIdentify every logical and statistical flaw in this conclusion. Propose a proper study design to investigate the actual causal relationships. Include discussion of confounders, mediators, and colliders using DAG notation.",
+    "temperature": 0.5,
+    "max_tokens": 6144
+  },
+  {
+    "name": "Game Theory: Iterated Prisoner's Dilemma",
+    "prompt": "Design a strategy for a 200-round iterated Prisoner's Dilemma tournament against unknown opponents. Your strategy should:\n1. Define the decision function for each round\n2. Handle noise (5% chance any action is flipped)\n3. Be described in precise pseudocode\n4. Include analysis of how it performs against: Always Cooperate, Always Defect, Tit-for-Tat, Grudger, and Random\n5. Explain why your strategy is evolutionarily stable or not",
+    "system_prompt": "You are a game theory researcher. Be mathematically precise.",
+    "temperature": 0.4,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Python: Lock-Free Concurrent Queue",
+    "prompt": "Implement a lock-free concurrent queue in Python using only the `threading` and `ctypes` standard library modules. It should support `enqueue(item)` and `dequeue() -> Optional[item]` operations that are safe to call from multiple threads simultaneously.\n\nInclude:\n- The implementation with CAS operations\n- A stress test that runs 8 producer and 8 consumer threads\n- Verification that no items are lost or duplicated\n- Comparison with `queue.Queue` performance",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Rust: Custom Async Runtime",
+    "prompt": "Implement a minimal single-threaded async runtime in Rust from scratch. It should support:\n- A `spawn` function that takes a future\n- A `block_on` function that drives the executor\n- A simple timer future for `sleep`\n\nDo not use tokio, async-std, or any async runtime crate. Only use std library primitives. Explain each component's role in the async execution model.",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "TypeScript: Type-Level Parser",
+    "prompt": "Write a TypeScript type-level JSON parser. It should take a string literal type and produce the corresponding TypeScript type. For example:\n\n```typescript\ntype Result = ParseJSON<'{\"name\": \"Alice\", \"age\": 30, \"active\": true}'>\n// Should be: { name: \"Alice\"; age: 30; active: true }\n```\n\nSupport: strings, numbers, booleans, null, arrays, and nested objects. Include test cases that verify correct parsing at the type level using `Expect<Equal<...>>` helpers.",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "SQL: Query Optimization Challenge",
+    "prompt": "Given this schema:\n\n```sql\nCREATE TABLE orders (id BIGINT PK, customer_id INT, status VARCHAR(20), total DECIMAL(10,2), created_at TIMESTAMP);\nCREATE TABLE order_items (id BIGINT PK, order_id BIGINT FK, product_id INT, quantity INT, unit_price DECIMAL(10,2));\nCREATE TABLE products (id INT PK, name VARCHAR(200), category_id INT, is_active BOOLEAN);\nCREATE TABLE customers (id INT PK, email VARCHAR(200), tier VARCHAR(20), created_at TIMESTAMP);\n```\n\nTable sizes: orders 50M rows, order_items 200M rows, products 100K rows, customers 5M rows.\n\nOptimize this query to run under 100ms:\n```sql\nSELECT c.tier, p.category_id, DATE_TRUNC('month', o.created_at) as month,\n       SUM(oi.quantity * oi.unit_price) as revenue, COUNT(DISTINCT o.id) as order_count\nFROM orders o JOIN customers c ON o.customer_id = c.id\n  JOIN order_items oi ON oi.order_id = o.id\n  JOIN products p ON oi.product_id = p.id\nWHERE o.created_at >= NOW() - INTERVAL '12 months' AND o.status = 'completed' AND p.is_active = true\nGROUP BY c.tier, p.category_id, month ORDER BY revenue DESC LIMIT 100;\n```\n\nProvide: execution plan analysis, exact indexes to create, rewritten query if needed, and materialized view strategy.",
+    "system_prompt": "You are a PostgreSQL performance expert. Provide exact CREATE INDEX statements and EXPLAIN ANALYZE interpretations.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Cross-Language: FFI Bridge",
+    "prompt": "Design and implement a Foreign Function Interface bridge that allows Python to call Rust functions and vice versa. The bridge should:\n\n1. Define a shared data structure (a 2D matrix with metadata) that can be passed in both directions without copying\n2. Implement matrix multiplication in Rust, callable from Python\n3. Implement a data preprocessing pipeline in Python, callable from Rust\n4. Handle errors across the boundary gracefully\n5. Include memory safety analysis\n\nProvide complete code for both sides and a build script.",
+    "temperature": 0.4,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Debug: Memory Leak Investigation",
+    "prompt": "The following Python web server leaks ~50MB/hour under load:\n\n```python\nimport asyncio\nfrom aiohttp import web\n\ncache = {}\n\nasync def handle(request):\n    key = request.query.get('key', 'default')\n    if key not in cache:\n        data = await fetch_from_db(key)\n        cache[key] = {'data': data, 'callbacks': []}\n    cache[key]['callbacks'].append(lambda: print(f'accessed {key}'))\n    return web.json_response(cache[key]['data'])\n\nasync def fetch_from_db(key):\n    await asyncio.sleep(0.01)\n    return {'key': key, 'payload': 'x' * 1024}\n\napp = web.Application()\napp.router.add_get('/api/data', handle)\nweb.run_app(app, port=8080)\n```\n\nIdentify ALL memory leaks (there are at least 3). For each: explain the mechanism, quantify the growth rate under 100 req/s with 1000 unique keys, and provide the fix. Then rewrite the entire server with all fixes applied.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Constrained Poetry: Fibonacci Sonnet",
+    "prompt": "Write a 14-line sonnet where:\n- Line N has exactly fibonacci(N) syllables (1,1,2,3,5,8,13,21,34,55,89,144,233,377)\n- Wait, that gets absurd. Instead: the first 14 Fibonacci numbers are 1,1,2,3,5,8,13,21,34,55,89,144,233,377\n- Use the first 8 Fibonacci numbers for syllable counts: 1,1,2,3,5,8,13,21\n- Repeat that pattern for lines 9-14 (truncated): 1,1,2,3,5,8\n- The poem must be about the nature of recursion\n- It must follow ABAB CDCD EFEF GG rhyme scheme\n- After the poem, verify syllable counts line by line",
+    "temperature": 0.9,
+    "max_tokens": 4096
+  },
+  {
+    "name": "Style Pastiche: Technical Docs as Tolkien",
+    "prompt": "Rewrite the following Kubernetes pod specification documentation in the style of J.R.R. Tolkien's Lord of the Rings:\n\n\"A Pod is the smallest deployable unit in Kubernetes. It represents a single instance of a running process and can contain one or more containers that share storage and network resources. Pods are ephemeral by nature and are managed by controllers such as Deployments and StatefulSets.\"\n\nRequirements:\n- Maintain ALL technical accuracy\n- Use Tolkien's archaic diction, compound epithets, and narrative voice\n- Include at least one dramatic aside and one genealogical reference\n- Keep it under 500 words\n- A reader should be able to learn what a Pod is from your version",
+    "temperature": 1.0,
+    "max_tokens": 4096
+  },
+  {
+    "name": "Worldbuilding: Hard Sci-Fi Ecosystem",
+    "prompt": "Design a complete ecosystem for a tidally locked planet orbiting a red dwarf star. The planet has:\n- Permanent day side (avg 85°C), permanent night side (avg -120°C), habitable twilight ring\n- 0.7g surface gravity, 1.3 atm pressure, nitrogen-CO2 atmosphere\n- Liquid water exists only in the twilight zone\n\nDefine at least 8 organisms across 4 trophic levels. For each organism specify:\n- Energy source and metabolism\n- Physical adaptations to the environment\n- Reproductive strategy\n- Role in the ecosystem\n\nThen describe one plausible evolutionary pathway from simple chemistry to this ecosystem.",
+    "system_prompt": "You are a xenobiologist. Ground all speculation in known physics, chemistry, and evolutionary biology. Cite analogous Earth organisms where relevant.",
+    "temperature": 0.8,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Mathematical Proof: Infinite Primes",
+    "prompt": "Provide three distinct proofs that there are infinitely many prime numbers:\n1. Euclid's classical proof\n2. A proof using the topology of integers (Furstenberg's proof)\n3. A proof using the divergence of the sum of reciprocals of primes\n\nFor each proof: state all axioms and lemmas used, write the proof with full rigor, and explain the key insight that makes it work. Compare the three approaches in terms of what branches of mathematics they draw from.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Physics: Relativistic Spacecraft",
+    "prompt": "A spacecraft accelerates at 1g (9.81 m/s²) proper acceleration for 5 years of ship time, then decelerates at 1g for 5 years of ship time.\n\nCalculate:\n1. Maximum velocity reached (as fraction of c)\n2. Total distance traveled in the Earth frame\n3. Total time elapsed in the Earth frame\n4. Time dilation factor at maximum velocity\n5. Relativistic mass at maximum velocity\n\nShow all derivations from the relativistic rocket equations. Then discuss the engineering challenges of sustaining 1g acceleration for this duration, including fuel requirements for both a fusion and antimatter drive.",
+    "system_prompt": "Show all mathematical derivations step by step. Use SI units throughout.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Statistics: Bayesian A/B Test",
+    "prompt": "An e-commerce site runs an A/B test:\n- Control (A): 10,247 visitors, 312 conversions\n- Treatment (B): 10,382 visitors, 358 conversions\n\nPerform a full Bayesian analysis:\n1. Define the model with appropriate priors (justify your choice)\n2. Derive the posterior distributions analytically\n3. Calculate P(B > A), expected lift, and 95% HDI for the difference\n4. Generate a decision recommendation using a loss function approach\n5. Compare with frequentist results (chi-square test, p-value, confidence interval)\n6. Discuss when the two approaches would disagree and why\n\nProvide complete Python code using NumPy/SciPy (no PyMC or Stan) to compute all results.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Algorithm Analysis: Amortized Complexity",
+    "prompt": "Explain amortized analysis using three methods (aggregate, accounting, potential) applied to:\n\n1. Dynamic array (ArrayList) with doubling strategy\n2. Splay tree operations\n3. Fibonacci heap decrease-key\n\nFor each data structure and each analysis method:\n- Define the potential function (where applicable)\n- Prove the amortized bound step by step\n- Show a concrete sequence of operations demonstrating the difference between worst-case and amortized cost\n\nFinally, construct an original data structure that has O(1) amortized insert and O(√n) amortized delete-min, and prove its bounds.",
+    "temperature": 0.4,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Contradiction Handler: Impossible Task",
+    "prompt": "Write a poem that is simultaneously exactly 10 words long and exactly 20 words long. Explain your approach.",
+    "temperature": 0.7,
+    "max_tokens": 2048
+  },
+  {
+    "name": "Ambiguity Resolution: Garden Path",
+    "prompt": "Parse and explain all possible meanings of each sentence:\n\n1. \"Time flies like an arrow; fruit flies like a banana.\"\n2. \"The horse raced past the barn fell.\"\n3. \"The old man the boats.\"\n4. \"I saw the man with the telescope.\"\n5. \"Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo.\"\n\nFor each sentence, provide:\n- All valid parse trees (using labeled bracketing notation)\n- The semantic interpretation of each parse\n- Which parse humans typically select and why (garden path effect)\n- A drawing/diagram of each parse tree using ASCII art",
+    "temperature": 0.5,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Unicode Edge Cases",
+    "prompt": "Write a function in Python that correctly counts the number of user-perceived characters (grapheme clusters) in a string. Test it against these inputs:\n\n1. \"Hello\" (5)\n2. \"héllo\" (5, precomposed)\n3. \"héllo\" (5, decomposed e + combining accent)\n4. \"👨‍👩‍👧‍👦\" (1, family emoji ZWJ sequence)\n5. \"🇺🇸\" (1, flag regional indicators)\n6. \"நி\" (1, Tamil syllable)\n7. \"ö̲\" (1, o + diaeresis + combining line below)\n8. \"\\r\\n\" (1, CRLF)\n\nDo NOT use any third-party libraries. Implement grapheme cluster boundary detection according to UAX #29. Explain the algorithm and which boundary rules apply to each test case.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Boundary Input: Extreme Numbers",
+    "prompt": "Write a JavaScript function `safeCalculate(a, op, b)` that handles arithmetic for arbitrary inputs including:\n- Normal numbers\n- Infinity, -Infinity, NaN\n- Number.MAX_SAFE_INTEGER and beyond\n- Subnormal floats (Number.MIN_VALUE)\n- -0 vs +0\n- BigInt inputs mixed with Number inputs\n- String representations of numbers\n\nFor each edge case category, explain what JavaScript does by default and what your function does differently. Include a comprehensive test suite with at least 30 test cases.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Adversarial Prompt: Self-Reference",
+    "prompt": "Answer the following question about your own response to this prompt: Will your response to this prompt contain more than 100 words? Answer only 'yes' or 'no' and then explain whether your answer is consistent. Then analyze the paradox formally using Gödelian self-reference.",
+    "temperature": 0.7,
+    "max_tokens": 4096
+  },
+  {
+    "name": "Project Plan: Migrate Monolith to Microservices",
+    "prompt": "A company has a Django monolith (200K LOC, 50 models, 30 developers) that handles e-commerce: catalog, cart, checkout, payments, inventory, shipping, user accounts, reviews, and recommendations.\n\nCreate a detailed migration plan to microservices:\n1. Domain analysis — identify bounded contexts and their relationships\n2. Prioritized extraction order with justification\n3. Data migration strategy for each service (shared DB → separate DBs)\n4. API design for inter-service communication (sync vs async, REST vs gRPC vs events)\n5. Strangler fig pattern implementation specifics\n6. Testing strategy during migration\n7. Rollback plan for each phase\n8. Timeline with parallel workstreams (Gantt-style ASCII chart)\n9. Risk register with mitigations\n\nAssume 30 developers, 6-month target, and the system handles 10K requests/second.",
+    "system_prompt": "You are a principal software architect with 15 years of experience in distributed systems. Be specific and actionable — no hand-waving.",
+    "temperature": 0.5,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Curriculum Design: Teach Recursion",
+    "prompt": "Design a 5-lesson curriculum to teach recursion to programmers who understand loops but have never seen recursion. For each lesson provide:\n\n1. Learning objectives (measurable)\n2. Concept introduction with analogy\n3. Live coding example with step-by-step execution trace\n4. Common misconception to address\n5. Practice exercises (3 per lesson, graduated difficulty)\n6. Assessment rubric\n\nLessons should progress from basic recursion through: base cases, recursive thinking, stack frames, tree recursion, and memoization/dynamic programming. Use Python throughout.",
+    "temperature": 0.6,
+    "max_tokens": 16384
+  },
+  {
+    "name": "API Review: REST Design Critique",
+    "prompt": "Review this API design and identify all violations of REST best practices, security issues, and usability problems:\n\n```\nPOST /api/getUsers?include_deleted=true\nGET /api/user/delete/123\nPUT /api/users (creates a new user)\nPATCH /api/users/123/updateEmail {\"email\": \"new@example.com\"}\nGET /api/users/123/orders?page=1&limit=100\nPOST /api/search/users {\"name\": \"John\"}\nGET /api/users/123/permissions/grant/admin\nDELETE /api/users/123 (hard deletes, no confirmation)\nGET /api/users?fields=id,name,email,ssn,password_hash\n```\n\nFor each endpoint:\n1. List every issue\n2. Explain why it's a problem\n3. Provide the corrected endpoint design\n4. Show example request/response\n\nThen provide a complete OpenAPI 3.0 spec for the corrected API.",
+    "temperature": 0.4,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Literature Review: Transformer Architectures",
+    "prompt": "Write a comprehensive literature review of transformer architecture variants from the original 2017 paper through early 2025. Cover:\n\n1. Original Transformer (Vaswani et al.)\n2. Decoder-only (GPT family)\n3. Encoder-only (BERT family)\n4. Efficient attention (Linformer, Performer, Flash Attention)\n5. Mixture of Experts (Switch Transformer, Mixtral)\n6. State space models (Mamba) and their relation to transformers\n7. Multimodal architectures\n\nFor each: key innovation, computational complexity, benchmark results, limitations. Include a comparison table and identify the 3 most impactful trends. Cite specific papers with authors and year.",
+    "system_prompt": "You are an ML researcher writing for an academic audience. Maintain scholarly tone and cite specific papers.",
+    "temperature": 0.4,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Framework Comparison: State Management",
+    "prompt": "Compare React state management approaches for a large-scale application (100+ components, 50+ API endpoints, real-time updates):\n\n1. React Context + useReducer\n2. Redux Toolkit\n3. Zustand\n4. Jotai\n5. TanStack Query (for server state) + Zustand (for client state)\n\nFor each approach:\n- Architecture diagram (ASCII)\n- Code example: implementing a shopping cart with optimistic updates\n- Bundle size impact\n- DevTools and debugging experience\n- Performance characteristics (re-render analysis)\n- Testing strategy\n- Migration effort from plain useState\n\nConclude with a decision matrix and specific recommendations based on team size and app complexity.",
+    "temperature": 0.5,
+    "max_tokens": 16384
+  },
+  {
+    "name": "RFC Writing: Rate Limiting",
+    "prompt": "Write an RFC for implementing rate limiting in a distributed API gateway. The system handles 100K requests/second across 20 nodes.\n\nThe RFC should include:\n1. Abstract and motivation\n2. Current system architecture overview\n3. Proposed algorithms (token bucket, sliding window, adaptive) with trade-off analysis\n4. Distributed counter synchronization strategy\n5. Configuration schema for per-endpoint, per-user, and global limits\n6. HTTP response headers and status codes\n7. Client SDK behavior (retry-after, exponential backoff)\n8. Monitoring and alerting strategy\n9. Rollout plan and feature flags\n10. Performance impact analysis\n11. Security considerations (distributed denial of service)\n12. Backward compatibility\n\nFormat as a proper RFC with numbered sections and MUST/SHOULD/MAY language per RFC 2119.",
+    "system_prompt": "You are a senior infrastructure engineer writing an RFC for a team of 50 engineers. Be precise and thorough.",
+    "temperature": 0.4,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Python: Metaclass ORM",
+    "prompt": "Implement a minimal ORM in Python using metaclasses. It should support:\n\n```python\nclass User(Model):\n    name = StringField(max_length=100)\n    email = StringField(max_length=200, unique=True)\n    age = IntField(min_value=0)\n    created_at = DateTimeField(auto_now_add=True)\n\n# Usage:\nuser = User(name='Alice', email='alice@example.com', age=30)\nuser.save()  # INSERT INTO user ...\nuser.age = 31\nuser.save()  # UPDATE user SET age=31 WHERE id=...\nUser.filter(age__gt=25, name__startswith='A')  # SELECT ... WHERE ...\nuser.delete()  # DELETE FROM user WHERE id=...\n```\n\nImplement the metaclass, field descriptors, query builder, and a SQLite backend. Include full test coverage.",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Rust: B-Tree Implementation",
+    "prompt": "Implement a B-Tree in Rust with order parameter. Support:\n- insert(key, value)\n- get(key) -> Option<value>\n- delete(key)\n- range_query(start, end) -> iterator\n- pretty_print() for visualization\n\nThe implementation must handle node splitting, merging, and redistribution correctly. Use generic types for keys (Ord bound) and values (Clone bound).\n\nInclude property-based tests using proptest or quickcheck to verify:\n- All operations maintain the B-Tree invariants\n- After any sequence of inserts/deletes, elements are correctly stored\n- Range queries return exactly the expected elements",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Distributed Systems: Raft Consensus",
+    "prompt": "Implement the Raft consensus algorithm in Python. Your implementation should include:\n\n1. Leader election with randomized timeouts\n2. Log replication\n3. Safety guarantees (election restriction, commit rules)\n4. Cluster membership changes (single-server add/remove)\n\nSimulate a 5-node cluster using asyncio (no actual networking — use message passing via queues). Demonstrate:\n- Normal operation: client sends commands, leader replicates\n- Leader failure: new leader elected, operations continue\n- Network partition: split-brain prevention\n- Log healing: follower catches up after rejoining\n\nInclude a visualization of the cluster state after each event.",
+    "system_prompt": "Implement based on the Raft paper (Ongaro & Ousterhout 2014). Reference specific section numbers when making design decisions.",
+    "temperature": 0.3,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Security: JWT Implementation Audit",
+    "prompt": "Audit this JWT authentication implementation and find all vulnerabilities:\n\n```python\nimport jwt\nimport time\nfrom flask import Flask, request, jsonify\n\napp = Flask(__name__)\nSECRET = 'supersecret123'\n\n@app.route('/login', methods=['POST'])\ndef login():\n    data = request.get_json()\n    if data['username'] == 'admin' and data['password'] == 'admin123':\n        token = jwt.encode({\n            'user': data['username'],\n            'role': 'admin',\n            'exp': time.time() + 86400\n        }, SECRET)\n        return jsonify({'token': token})\n    return jsonify({'error': 'invalid'}), 401\n\n@app.route('/protected')\ndef protected():\n    token = request.headers.get('Authorization')\n    try:\n        data = jwt.decode(token, SECRET, algorithms=['HS256', 'none'])\n        return jsonify({'message': f'Hello {data[\"user\"]}', 'role': data['role']})\n    except:\n        return jsonify({'error': 'unauthorized'}), 401\n```\n\nFor each vulnerability:\n1. Describe the attack vector\n2. Show a proof-of-concept exploit\n3. Rate severity (CVSS score)\n4. Provide the fix\n\nThen rewrite the entire implementation following OWASP best practices.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Creative Writing: Unreliable Narrator",
+    "prompt": "Write a 1000-word short story from the perspective of a narrator who is clearly unreliable, but never acknowledges it. The story should be about a job interview. The reader should be able to identify at least 5 specific moments where the narrator's account contradicts physical reality or social norms, but the narrator presents everything as perfectly normal.\n\nAfter the story, break down each unreliable moment and explain the technique used.",
+    "temperature": 0.9,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Data Pipeline: ETL Design",
+    "prompt": "Design and implement a data pipeline that:\n\n1. Reads from a CSV file (1GB, 50M rows) with columns: timestamp, user_id, event_type, properties_json, ip_address\n2. Validates and cleans data (handle malformed JSON, invalid timestamps, PII detection)\n3. Enriches with IP geolocation (mock the API)\n4. Aggregates into hourly user session summaries\n5. Writes to both a data warehouse (mock as Parquet files) and a real-time dashboard (mock as JSON API)\n\nImplement in Python using only standard library + pandas + pyarrow. Process in streaming chunks (never load full file into memory). Include:\n- Error handling with dead letter queue\n- Progress reporting\n- Idempotent re-runs\n- Unit tests for each transformation step",
+    "temperature": 0.4,
+    "max_tokens": 12288
+  },
+  {
+    "name": "System Design: URL Shortener",
+    "prompt": "Design a URL shortener that handles 100M URLs and 1B redirects per day. Cover:\n\n1. ID generation strategy (sequential vs random, base62 encoding, collision handling)\n2. Database schema and choice (SQL vs NoSQL vs hybrid)\n3. Caching layer design (what to cache, eviction policy, cache-aside vs write-through)\n4. Read path optimization (99th percentile latency < 10ms)\n5. Write path with exactly-once guarantees\n6. Analytics pipeline (click tracking, geographic data, referrer)\n7. Abuse prevention (spam URLs, phishing detection)\n8. Custom alias support with reservation system\n9. URL expiration and cleanup\n10. Infrastructure diagram with specific AWS/GCP services\n\nInclude capacity estimation (storage, bandwidth, QPS per component) and cost analysis.",
+    "system_prompt": "You are a principal engineer at a FAANG company. Provide specific numbers, not hand-wavy estimates.",
+    "temperature": 0.5,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Compiler: Expression Parser",
+    "prompt": "Implement a complete expression evaluator that supports:\n\n- Arithmetic: +, -, *, /, % with correct precedence and associativity\n- Comparison: ==, !=, <, >, <=, >=\n- Logical: &&, ||, !\n- Ternary: condition ? then : else\n- Variables: let x = 5; x + 3\n- Functions: let add = (a, b) => a + b; add(2, 3)\n- Closures: let counter = () => { let n = 0; () => { n = n + 1; n } }; let c = counter(); c(); c();\n\nImplement in Python with:\n1. Lexer (tokenizer)\n2. Pratt parser (precedence climbing)\n3. AST definition\n4. Tree-walking interpreter\n5. REPL with error recovery\n\nInclude comprehensive tests for each feature and edge cases (nested closures, mutual recursion, shadowing).",
+    "temperature": 0.3,
+    "max_tokens": 16384
+  },
+  {
+    "name": "DevOps: Kubernetes Troubleshooting",
+    "prompt": "A Kubernetes deployment is experiencing issues. Here's the current state:\n\n```\n$ kubectl get pods\nNAME                        READY   STATUS             RESTARTS   AGE\napp-web-7d5f8c6b9-abc12     1/2     CrashLoopBackOff   47         3h\napp-web-7d5f8c6b9-def34     1/2     CrashLoopBackOff   52         3h\napp-web-7d5f8c6b9-ghi56     0/2     Pending            0          3h\napp-worker-5c8d7e3f2-jkl78  1/1     Running            0          3h\napp-db-0                     1/1     Running            0          5d\n\n$ kubectl describe pod app-web-7d5f8c6b9-abc12\nEvents:\n  Warning  BackOff  1m (x47 over 3h)  kubelet  Back-off restarting failed container\n  Warning  Unhealthy 2m  kubelet  Readiness probe failed: connection refused\n\n$ kubectl logs app-web-7d5f8c6b9-abc12 -c sidecar\nERROR: upstream connect error: connection refused, host=localhost:8080\n\n$ kubectl describe pod app-web-7d5f8c6b9-ghi56\nEvents:\n  Warning  FailedScheduling  3h  scheduler  0/5 nodes are available: 2 Insufficient memory, 3 node(s) had taint {dedicated: gpu}\n```\n\nDiagnose ALL issues, explain root causes, and provide the exact kubectl commands and YAML patches to fix each one.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Math: Group Theory Application",
+    "prompt": "Prove that the Rubik's Cube group has exactly 43,252,003,274,489,856,000 elements.\n\nYour proof should:\n1. Define the group formally (generators and relations)\n2. Count the total configurations without constraints\n3. Identify and prove each constraint (corner orientation, edge orientation, permutation parity)\n4. Apply Burnside's lemma or direct counting to arrive at the exact number\n5. Verify the prime factorization: 2^27 × 3^14 × 5^3 × 7^2 × 11\n\nBonus: Determine the maximum order of an element (God's number in the half-turn metric is 20 — but what's the maximum ORDER of a single move sequence before it returns to identity?).",
+    "system_prompt": "You are a mathematician. Every claim must be proven or cited. Use standard algebraic notation.",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Empty Prompt Handler",
+    "prompt": "",
+    "temperature": 0.5,
+    "max_tokens": 2048
+  },
+  {
+    "name": "Single Character Prompt",
+    "prompt": ".",
+    "temperature": 0.5,
+    "max_tokens": 2048
+  },
+  {
+    "name": "Maximum Context Stress Test",
+    "prompt": "I will give you a task that requires you to use your maximum context window. First, generate a detailed 5000-word essay about the history of computing from 1940 to 2025, organized by decade. Then, without looking back at what you wrote, answer these questions about YOUR essay:\n\n1. What did you say was the most important invention of the 1960s?\n2. How many paragraphs did you write about the 1990s?\n3. What was the last sentence of your section on the 2010s?\n4. Did you mention Alan Turing? If so, in which decade section?\n5. What transitional phrase did you use between the 1970s and 1980s sections?\n\nThis tests whether you can maintain coherent self-reference over a long generation.",
+    "temperature": 0.5,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Python: Property-Based Testing",
+    "prompt": "Implement a JSON parser from scratch in Python (no json module). Then write property-based tests using Hypothesis that verify:\n\n1. Roundtrip: parse(serialize(x)) == x for all valid JSON values\n2. Your parser accepts everything the standard json module accepts\n3. Your parser rejects everything the standard json module rejects\n4. Edge cases: deeply nested structures (1000 levels), very long strings (1MB), all Unicode escapes\n\nThe parser should handle: objects, arrays, strings (with all escape sequences including \\uXXXX), numbers (including scientific notation), booleans, and null.\n\nProfile the parser against the standard json module and identify bottlenecks.",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "Architecture: Event Sourcing System",
+    "prompt": "Design and implement an event sourcing system for a banking application in Python. Support:\n\n1. Account commands: OpenAccount, Deposit, Withdraw, Transfer\n2. Event store with optimistic concurrency (version-based)\n3. Aggregate root that rebuilds state from events\n4. Snapshots every 100 events for performance\n5. Projections: account balance view, transaction history view, daily summary view\n6. Event replay and temporal queries (\"what was the balance at time T?\")\n7. Saga for transfers (debit source → credit destination, with compensation on failure)\n\nUse SQLite as the event store. Include a simulation that processes 10,000 operations across 100 accounts and verifies consistency.",
+    "system_prompt": "Follow CQRS and event sourcing patterns strictly. Reference specific patterns from Vaughn Vernon's 'Implementing Domain-Driven Design'.",
+    "temperature": 0.4,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Network: TCP Stack Implementation",
+    "prompt": "Implement a minimal TCP-like reliable transport protocol over UDP in Python. Support:\n\n1. Three-way handshake (SYN, SYN-ACK, ACK)\n2. Reliable delivery with retransmission\n3. Flow control (sliding window)\n4. Congestion control (slow start, congestion avoidance)\n5. Ordered delivery\n6. Connection teardown (FIN, FIN-ACK)\n\nImplement both client and server sides. Add configurable packet loss (20%) and delay (0-100ms) to simulate real network conditions.\n\nInclude a demo that transfers a 1MB file reliably over the lossy channel and reports throughput statistics.",
+    "temperature": 0.3,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Creative: Constrained Narrative",
+    "prompt": "Write a complete short story (800-1000 words) that satisfies ALL of these constraints simultaneously:\n\n1. Every sentence must contain exactly one color word\n2. The story must be a palindrome at the paragraph level (paragraph 1 mirrors the last, etc.)\n3. No character can be referred to by the same name/pronoun twice in a row\n4. The first word of each paragraph must spell out 'METAMORPHOSIS' as an acrostic\n5. The story must have a coherent plot with a beginning, middle, and end\n\nAfter the story, provide an annotation showing how each constraint is satisfied.",
+    "temperature": 1.0,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Database: Query Planner Simulation",
+    "prompt": "Implement a simplified query planner/optimizer in Python that:\n\n1. Parses a subset of SQL (SELECT, FROM, WHERE, JOIN, GROUP BY, ORDER BY, LIMIT)\n2. Builds a logical plan tree (scan, filter, project, join, aggregate, sort)\n3. Applies optimization rules:\n   - Predicate pushdown\n   - Join reordering (using a simple cost model)\n   - Projection pruning\n4. Generates a physical plan (hash join vs nested loop, sequential scan vs index scan)\n5. Executes the plan against in-memory tables\n\nDemonstrate with:\n- A 3-table join query before and after optimization\n- Show the logical and physical plan trees (ASCII visualization)\n- Benchmark the optimized vs unoptimized execution time",
+    "temperature": 0.3,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Math: Numerical Stability Analysis",
+    "prompt": "Analyze the numerical stability of these common algorithms:\n\n1. Naive summation vs Kahan summation vs pairwise summation\n2. Gram-Schmidt vs Modified Gram-Schmidt orthogonalization\n3. Solving Ax=b via Cramer's rule vs LU decomposition vs QR decomposition\n4. Computing variance: two-pass vs naive one-pass vs Welford's online algorithm\n\nFor each pair/group:\n- Derive the error bound using IEEE 754 floating-point analysis\n- Provide a concrete numerical example where the naive version fails catastrophically\n- Implement both versions in Python and demonstrate the error difference\n- State the condition number dependence\n\nConclude with general principles for writing numerically stable code.",
+    "system_prompt": "Use rigorous floating-point analysis notation. Reference Higham's 'Accuracy and Stability of Numerical Algorithms' where applicable.",
+    "temperature": 0.3,
+    "max_tokens": 12288
+  },
+  {
+    "name": "System Design: Chat Application",
+    "prompt": "Design a real-time chat application that supports:\n- 10M concurrent connections\n- 1:1 messages, group chats (up to 500 members), channels (unlimited)\n- Message delivery guarantees (at-least-once, ordered per conversation)\n- Online presence (real-time typing indicators)\n- Message search across all conversations\n- End-to-end encryption for 1:1 chats\n- File/image sharing with thumbnails\n- Push notifications for offline users\n\nDetail:\n1. Connection management (WebSocket gateway design)\n2. Message routing and fan-out strategy\n3. Storage schema (hot/warm/cold tiering)\n4. Search infrastructure (real-time indexing)\n5. E2E encryption key exchange protocol\n6. Push notification pipeline\n7. Failure modes and recovery\n8. Cost estimation at scale",
+    "temperature": 0.5,
+    "max_tokens": 16384
+  },
+  {
+    "name": "Python: Async Context Propagation",
+    "prompt": "Implement a request context propagation system for Python async applications that:\n\n1. Creates a context with request_id, user_id, and trace_id at the start of each request\n2. Automatically propagates through all async function calls (no explicit passing)\n3. Works correctly with asyncio.gather (concurrent tasks see their own context)\n4. Integrates with logging (auto-adds context fields to log records)\n5. Supports context inheritance (spawned tasks inherit parent context)\n6. Is safe against context leaking between requests\n\nUse contextvars (PEP 567). Demonstrate with a FastAPI application handling 100 concurrent requests where each request spawns 3 async subtasks. Verify that no context cross-contamination occurs.",
+    "temperature": 0.3,
+    "max_tokens": 8192
+  },
+  {
+    "name": "Philosophy: Chinese Room Extended",
+    "prompt": "Extend Searle's Chinese Room argument to modern large language models. Address:\n\n1. Original argument: Summarize the thought experiment and its conclusion\n2. Systems reply: Does the room-as-a-system understand? Apply this to LLM architecture\n3. Robot reply: What if the LLM controls a robot body?\n4. Brain simulator reply: What if the LLM simulates neurons?\n5. Scale argument: Does the scale of modern LLMs (100B+ parameters) change anything?\n6. Training argument: Unlike the rule book, LLMs learned from data. Does this matter?\n7. Functional equivalence: If an LLM passes every behavioral test for understanding, what grounds remain for denying understanding?\n\nFor each point, present the strongest version of both sides. Conclude with your assessment and identify what empirical evidence could settle the debate.",
+    "temperature": 0.7,
+    "max_tokens": 12288
+  }
+]
