@@ -156,22 +156,27 @@ export default function TokenChart({ data }: Props) {
           );
         })}
 
-        {/* Data lines — one per model */}
+        {/* Data lines + dots — one per model */}
         {models.map((model, i) => {
           const modelPoints = byModel.get(model)!;
+          const color = COLORS[i % COLORS.length];
           const points = modelPoints.map((d) => ({
             x: PAD.left + ((new Date(d.timestamp).getTime() - tMin) / tRange) * INNER_W,
             y: PAD.top + INNER_H - (d.cumulative_total_tokens / yMax) * INNER_H,
           }));
           return (
-            <path
-              key={model}
-              d={buildPath(points)}
-              fill="none"
-              stroke={COLORS[i % COLORS.length]}
-              strokeWidth={2}
-              strokeLinejoin="round"
-            />
+            <g key={model}>
+              <path
+                d={buildPath(points)}
+                fill="none"
+                stroke={color}
+                strokeWidth={2}
+                strokeLinejoin="round"
+              />
+              {points.map((p, j) => (
+                <circle key={j} cx={p.x} cy={p.y} r={3} fill={color} />
+              ))}
+            </g>
           );
         })}
       </svg>
