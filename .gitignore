@@ -20,3 +20,10 @@ dist/
 # IDE
 .vscode/
 .idea/
+
+# Test coverage
+htmlcov/
+.coverage
+
+# Symlink for tests
+gpu_monitor

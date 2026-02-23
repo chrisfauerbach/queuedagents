@@ -1,0 +1,15 @@
+[run]
+concurrency = greenlet
+source =
+    shared
+    backend
+    worker
+    gpu_monitor
+    gpu-monitor
+omit =
+    */alembic/*
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.
+    pragma: no cover
