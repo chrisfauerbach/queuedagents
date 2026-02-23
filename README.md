@@ -217,8 +217,64 @@ queuedagents/
 │   ├── config.py        # Pydantic settings
 │   ├── database.py      # SQLAlchemy async engine + session
 │   └── models.py        # Job, Comparison, GpuMetric, Prompt ORM models
+├── tests/               # 136 pytest tests (97% coverage)
+│   ├── conftest.py      # In-memory DB, session, and ASGI client fixtures
+│   └── test_*.py        # 16 test modules
+├── requirements-test.txt
+├── pytest.ini
 ├── docker-compose.yml
 └── .env.example
+```
+
+## Testing
+
+The backend has a comprehensive test suite covering all Python services: backend (FastAPI routes), worker (job processing), gpu-monitor (metrics collection), and shared (models, config, database).
+
+### Running Tests
+
+```bash
+# One-time setup
+ln -sf gpu-monitor gpu_monitor
+pip install -r requirements-test.txt
+
+# Run all 136 tests with coverage
+pytest --cov --cov-report=term-missing -v
+
+# Run a single test file
+pytest tests/test_routes_jobs.py -v
+```
+
+### What Gets Mocked
+
+The test suite runs entirely offline — no Docker, no GPU, no Ollama needed. Three external systems are mocked out:
+
+| System | Mock Strategy | Why |
+|---|---|---|
+| **SQLite database** | Replaced with an in-memory SQLite engine (`sqlite+aiosqlite://`). Each test gets a fresh database via function-scoped fixtures — tables are created before the test and dropped after. | Eliminates filesystem I/O, prevents test pollution, runs in milliseconds. |
+| **Ollama HTTP API** | Intercepted at the `httpx` transport layer using [respx](https://github.com/lundberg/respx). Routes that call Ollama (`/api/models`, `/api/models/catalog`, `/api/models/show`, `/api/models/pull`, `DELETE /api/models`) and the worker's `generate()` function all get deterministic fake responses. | Ollama requires a running server with downloaded models. Mocking lets us test every code path — success, HTTP errors, missing fields, timeouts — without a live inference server. |
+| **NVIDIA GPU driver (pynvml)** | The entire `pynvml` module is replaced via `unittest.mock.patch` with a `MagicMock` that returns `SimpleNamespace` objects mimicking real GPU handles, utilization rates, memory info, temperature, and power readings. | The gpu-monitor service calls `pynvml.nvmlDeviceGetHandleByIndex()` and related C library bindings that require an NVIDIA GPU. Mocking lets us verify unit conversions (milliwatts → watts, bytes → megabytes), multi-GPU iteration, metric pruning, and error handling. |
+
+### Test Structure
+
+```
+tests/
+├── conftest.py                  # Shared fixtures (engine, session, FastAPI client)
+├── test_shared_config.py        # Settings defaults and env overrides
+├── test_shared_models.py        # ORM defaults, relationships, enums
+├── test_shared_database.py      # Engine, Base metadata, get_session
+├── test_backend_main.py         # Health endpoint, CORS, router registration
+├── test_backend_schemas.py      # Pydantic validation on all request schemas
+├── test_backend_seed.py         # Prompt seeding logic and idempotency
+├── test_model_catalog.py        # Catalog structure and data integrity
+├── test_routes_jobs.py          # Job CRUD, token-usage cumulative logic, stats
+├── test_routes_comparisons.py   # Comparison CRUD, set/clear winner validation
+├── test_routes_gpu.py           # GPU metrics query with time filtering
+├── test_routes_models.py        # Ollama proxy endpoints (respx mocks)
+├── test_routes_leaderboard.py   # TPS calculation, win rate, sorting
+├── test_routes_prompts.py       # Prompt CRUD with partial updates
+├── test_worker_main.py          # Job claim/complete/fail lifecycle, main loop
+├── test_worker_ollama.py        # generate() request/response handling
+└── test_gpu_monitor.py          # Record/prune metrics, main loop resilience
 ```
 
 ## Development
