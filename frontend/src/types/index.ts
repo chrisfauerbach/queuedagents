@@ -50,6 +50,7 @@ export interface Comparison {
   temperature: number;
   max_tokens: number;
   created_at: string;
+  winner_job_id: string | null;
   jobs: Job[];
 }
 

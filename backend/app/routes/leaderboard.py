@@ -45,7 +45,7 @@ async def get_leaderboard(session: AsyncSession = Depends(get_session)):
     for model, values in model_tps.items():
         avg_tps[model] = sum(values) / len(values)
 
-    # Win rate from comparisons
+    # Win rate from comparisons (user-preference based)
     comparisons_result = await session.execute(
         select(Comparison)
     )
@@ -63,30 +63,21 @@ async def get_leaderboard(session: AsyncSession = Depends(get_session)):
         if not all_terminal:
             continue
 
-        # Find completed jobs with valid metrics
-        candidates = []
-        for j in jobs:
-            if (
-                j.status == JobStatus.completed
-                and j.output_tokens is not None
-                and j.generation_time_ms is not None
-                and j.generation_time_ms > 0
-            ):
-                tps = j.output_tokens / (j.generation_time_ms / 1000)
-                candidates.append((j.model, tps))
-
-        if len(candidates) < 2:
+        completed_jobs = [j for j in jobs if j.status == JobStatus.completed]
+        if len(completed_jobs) < 2:
             continue
 
-        # Track appearances for all completed candidates
-        for model, _ in candidates:
-            appearances[model] += 1
+        # Track appearances for all completed jobs
+        for j in completed_jobs:
+            appearances[j.model] += 1
 
-        # Find winner (highest tokens/sec)
-        candidates.sort(key=lambda x: x[1], reverse=True)
-        # Check for tie at the top
-        if candidates[0][1] != candidates[1][1]:
-            wins[candidates[0][0]] += 1
+        # Count win if user has rated this comparison
+        if comparison.winner_job_id:
+            winner_job = next(
+                (j for j in completed_jobs if j.id == comparison.winner_job_id), None
+            )
+            if winner_job:
+                wins[winner_job.model] += 1
 
     # Merge into response
     entries = []

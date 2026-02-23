@@ -56,6 +56,20 @@ export function fetchComparison(id: string): Promise<Comparison> {
   return request<Comparison>(`/comparisons/${id}`);
 }
 
+export function setComparisonWinner(comparisonId: string, jobId: string): Promise<Comparison> {
+  return request<Comparison>(`/comparisons/${comparisonId}/winner`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ winner_job_id: jobId }),
+  });
+}
+
+export function clearComparisonWinner(comparisonId: string): Promise<Comparison> {
+  return request<Comparison>(`/comparisons/${comparisonId}/winner`, {
+    method: "DELETE",
+  });
+}
+
 export function fetchTokenUsage(hours: number = 24): Promise<TokenUsagePoint[]> {
   return request<TokenUsagePoint[]>(`/token-usage?hours=${hours}`);
 }

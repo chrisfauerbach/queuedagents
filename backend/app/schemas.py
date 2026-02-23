@@ -66,9 +66,14 @@ class ComparisonResponse(BaseModel):
     temperature: float
     max_tokens: int
     created_at: datetime
+    winner_job_id: str | None
     jobs: list[JobResponse]
 
     model_config = {"from_attributes": True}
+
+
+class SetWinnerRequest(BaseModel):
+    winner_job_id: str
 
 
 class PromptCreate(BaseModel):

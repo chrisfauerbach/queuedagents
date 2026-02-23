@@ -67,9 +67,13 @@ class Comparison(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
+    winner_job_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("jobs.id"), nullable=True
+    )
 
     jobs: Mapped[list["Job"]] = relationship(
-        "Job", backref="comparison", lazy="selectin"
+        "Job", backref="comparison", lazy="selectin",
+        foreign_keys="[Job.comparison_id]",
     )
 
 

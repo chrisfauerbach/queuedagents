@@ -280,7 +280,14 @@ export default function ComparePage() {
                   className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-gray-900">{c.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-900">{c.name}</span>
+                      {c.winner_job_id && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-700">
+                          Rated
+                        </span>
+                      )}
+                    </div>
                     <span className="text-xs text-gray-400">
                       {timeAgo(c.created_at)}
                     </span>
